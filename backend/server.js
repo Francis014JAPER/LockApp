@@ -27,31 +27,58 @@ const LockSchema = new mongoose.Schema({
 
 const Lock = mongoose.model('Lock', LockSchema);
 
-app.use(cors());
+app.use(cors({
+    origin: '*', // Permitir todas las solicitudes
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(bodyParser.json());
 
 app.get('/locks', async (req, res) => {
-    const locks = await Lock.find();
-    res.send(locks);
+    try {
+        const locks = await Lock.find();
+        res.send(locks);
+    } catch (error) {
+        console.error('Error fetching locks:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.post('/locks', async (req, res) => {
-    const lock = new Lock(req.body);
-    await lock.save();
-    io.emit('lockChange', await Lock.find());
-    res.send(lock);
+    try {
+        const lock = new Lock(req.body);
+        await lock.save();
+        const locks = await Lock.find();
+        io.emit('lockChange', locks);
+        res.send(lock);
+    } catch (error) {
+        console.error('Error creating lock:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.put('/locks/:id', async (req, res) => {
-    await Lock.findByIdAndUpdate(req.params.id, req.body);
-    io.emit('lockChange', await Lock.find());
-    res.send('Updated');
+    try {
+        await Lock.findByIdAndUpdate(req.params.id, req.body);
+        const locks = await Lock.find();
+        io.emit('lockChange', locks);
+        res.send('Updated');
+    } catch (error) {
+        console.error('Error updating lock:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.delete('/locks/:id', async (req, res) => {
-    await Lock.findByIdAndDelete(req.params.id);
-    io.emit('lockChange', await Lock.find());
-    res.send('Deleted');
+    try {
+        await Lock.findByIdAndDelete(req.params.id);
+        const locks = await Lock.find();
+        io.emit('lockChange', locks);
+        res.send('Deleted');
+    } catch (error) {
+        console.error('Error deleting lock:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 io.on('connection', (socket) => {

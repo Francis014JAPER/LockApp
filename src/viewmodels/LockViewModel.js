@@ -10,7 +10,8 @@ class LockViewModel {
             fetchLocks: action,
             addLock: action,
             updateLock: action,
-            deleteLock: action
+            deleteLock: action,
+            setLocks: action,
         });
         this.fetchLocks();
         this.socket = io('http://192.168.0.107:5000');
@@ -20,18 +21,21 @@ class LockViewModel {
     }
 
     setLocks(locks) {
-        this.locks = locks;
+        // Ensure unique locks by _id
+        const uniqueLocks = locks.reduce((acc, lock) => {
+            if (!acc.some(item => item._id === lock._id)) {
+                acc.push(lock);
+            }
+            return acc;
+        }, []);
+        this.locks = uniqueLocks;
     }
 
     async fetchLocks() {
         try {
             const response = await axios.get('http://192.168.0.107:5000/locks');
             if (response.data) {
-                const locksWithId = response.data.map((lock, index) => ({
-                    ...lock,
-                    id: lock._id || `generated-id-${index}`
-                }));
-                this.setLocks(locksWithId);
+                this.setLocks(response.data);
             }
         } catch (error) {
             console.error(error);

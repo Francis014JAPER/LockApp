@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import lockViewModel from '../viewmodels/LockViewModel';
 
 const EditLockForm = ({ route }) => {
   const { lock } = route.params;
@@ -19,12 +20,49 @@ const EditLockForm = ({ route }) => {
     setError(null);
 
     try {
-      navigation.goBack();
+      await lockViewModel.updateLock(lock._id, { name });
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        setError('No se puede regresar a la pantalla anterior.');
+      }
     } catch (error) {
       setError(error.message);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeleteLock = async () => {
+    Alert.alert(
+      "Confirmación",
+      "¿Estás seguro de que deseas eliminar esta cerradura?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              await lockViewModel.deleteLock(lock._id);
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                setError('No se puede regresar a la pantalla anterior.');
+              }
+            } catch (error) {
+              setError(error.message);
+            } finally {
+              setIsLoading(false);
+            }
+          },
+          style: "destructive"
+        }
+      ]
+    );
   };
 
   return (
@@ -40,7 +78,11 @@ const EditLockForm = ({ route }) => {
       {isLoading ? (
         <Text>Cargando...</Text>
       ) : (
-        <Button title="Guardar Cambios" onPress={handleUpdateLock} />
+        <>
+          <Button title="Guardar Cambios" onPress={handleUpdateLock} disabled={isLoading} />
+          <View style={styles.space} />
+          <Button title="Eliminar Cerradura" onPress={handleDeleteLock} color="red" disabled={isLoading} />
+        </>
       )}
     </View>
   );
@@ -57,6 +99,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+  },
+  space: {
+    height: 10,
   },
 });
 

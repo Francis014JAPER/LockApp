@@ -9,9 +9,16 @@ const AddLockForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
 
+    // Flag to prevent multiple simultaneous submissions
+    let isSubmitting = false;
+
     const handleAddLock = async () => {
+        if (isSubmitting) return;
+        isSubmitting = true;
+
         if (!name.trim()) {
             setError('El nombre de la chapa no puede estar vacío');
+            isSubmitting = false;
             return;
         }
 
@@ -35,6 +42,7 @@ const AddLockForm = () => {
             }
         } finally {
             setIsLoading(false);
+            isSubmitting = false;
         }
     };
 
@@ -50,7 +58,7 @@ const AddLockForm = () => {
             {isLoading ? (
                 <Text>Cargando...</Text>
             ) : (
-                <Button title="Agregar Chapa" onPress={handleAddLock} />
+                <Button title="Agregar Chapa" onPress={handleAddLock} disabled={isLoading} />
             )}
         </View>
     );

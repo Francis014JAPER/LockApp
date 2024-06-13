@@ -7,7 +7,7 @@ const LockList = observer(({ navigation }) => (
     <View style={styles.container}>
         <FlatList
             data={lockViewModel.locks}
-            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
+            keyExtractor={(item) => item._id.toString()}
             renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleLockPress(item, navigation)}> 
                     <View style={styles.item}>
