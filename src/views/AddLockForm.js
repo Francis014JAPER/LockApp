@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import lockViewModel from '../viewmodels/LockViewModel';
 
@@ -9,7 +9,7 @@ const AddLockForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
 
-    // Flag to prevent multiple simultaneous submissions
+    // Variable para prevenir envíos múltiples simultáneos
     let isSubmitting = false;
 
     const handleAddLock = async () => {
@@ -48,17 +48,21 @@ const AddLockForm = () => {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.title}>Agregar Nueva Chapa</Text>
             <TextInput
                 placeholder="Nombre de la chapa"
+                placeholderTextColor="#9c9c9c"
                 value={name}
                 onChangeText={setName}
                 style={styles.input}
             />
-            {error && <Text style={{ color: 'red' }}>Error: {error}</Text>}
+            {error && <Text style={styles.errorText}>{error}</Text>}
             {isLoading ? (
-                <Text>Cargando...</Text>
+                <Text style={styles.loadingText}>Cargando...</Text>
             ) : (
-                <Button title="Agregar Chapa" onPress={handleAddLock} disabled={isLoading} />
+                <TouchableOpacity style={styles.addButton} onPress={handleAddLock} disabled={isLoading}>
+                    <Text style={styles.addButtonText}>Agregar Chapa</Text>
+                </TouchableOpacity>
             )}
         </View>
     );
@@ -68,14 +72,46 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
+        backgroundColor: '#1c1c1e',
         padding: 16,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: 16,
     },
     input: {
         height: 40,
-        borderColor: 'gray',
+        borderColor: '#2c2c2e',
         borderWidth: 1,
+        backgroundColor: '#2c2c2e',
+        borderRadius: 8,
+        color: 'white',
+        paddingHorizontal: 10,
         marginBottom: 12,
-        padding: 8,
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    loadingText: {
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    addButton: {
+        padding: 16,
+        backgroundColor: '#007aff',
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    addButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
     },
 });
 

@@ -16,7 +16,7 @@ const App = () => {
             <Stack.Navigator>
                 <Stack.Screen name="LockList" component={LockList} options={{ title: 'Lista de Chapas' }} />
                 <Stack.Screen name="AddLockForm" component={AddLockForm} options={{ title: 'Agregar Chapa' }} />
-                <Stack.Screen name="EditLockForm" component={EditLockForm} />
+                <Stack.Screen name="EditLockForm" component={EditLockForm} options={{ title: 'Ay papaya de celaya!!' }} />
             </Stack.Navigator>
         </NavigationContainer>
     );
